@@ -3,7 +3,7 @@ import styled from 'styled-components'
 import Center from '../components/Center'
 import { spacing } from '../theme/spacing'
 import Button from '../components/Button'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useCallback } from 'react'
 import { CartContext } from '../context/CartContextProvider'
 import config from '../config.json'
 import axios from 'axios'
@@ -78,7 +78,7 @@ const CartPage = () => {
 
   const backendURL = config.backendURL
 
-  const getCartProducts = async () => {
+  const getCartProducts = useCallback(async () => {
     try {
       if (cartProducts.length > 0) {
         const { data } = await axios.post(`${backendURL}/products/cartIds`, {
@@ -91,11 +91,11 @@ const CartPage = () => {
     } catch (error: any) {
       console.error('Error fetching data:', error.message)
     }
-  }
+  }, [cartProducts, backendURL])
 
   useEffect(() => {
     getCartProducts()
-  }, [cartProducts])
+  }, [cartProducts, getCartProducts])
 
   useEffect(() => {
     if (
@@ -104,7 +104,7 @@ const CartPage = () => {
     ) {
       clearCart()
     }
-  }, [])
+  }, [clearCart])
 
   const addMoreProducts = (id: string) => {
     addProducts(id)

@@ -1,5 +1,5 @@
 'use client'
-import React, { FC, useContext, useEffect, useState } from 'react'
+import React, { FC, useContext, useEffect, useState, useCallback } from 'react'
 import Center from '../components/Center'
 import Title from '../components/Title'
 import Products from '../types/products'
@@ -41,10 +41,10 @@ const Price = styled.span`
 
 const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
   const { addProducts } = useContext(CartContext)
-  const [product, setProduct] = useState<Products | null>(null)
+  const [product, setProduct] = useState<Products | null>()
   const id = productid[1]
 
-  const getProduct = async () => {
+  const getProduct = useCallback(async () => {
     try {
       const backendURL = config.backendURL
       const { data } = await axios.get<Products | null>(
@@ -52,38 +52,34 @@ const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
       )
       setProduct(data)
     } catch (error: any) {
-      console.error('Error fetching data:', error.message)
+      console.error('Error fetching product:', error.message)
     }
-  }
+  }, [id])
 
   useEffect(() => {
     getProduct()
-  }, [id])
+  }, [getProduct])
+
+  if (!product) {
+    return <Center>Loading...</Center>
+  }
 
   return (
     <Center>
       <ColWrapper>
         <WhiteBox>
-          <ProductImages images={product?.imageUrl || []} />
+          <ProductImages images={product.imageUrl} />
         </WhiteBox>
-        <div>
-          <Title>{product?.title}</Title>
-          <p>{product?.description}</p>
+        <WhiteBox>
+          <Title>{product.title}</Title>
           <PriceRaw>
-            <div>
-              <Price>${product?.price}</Price>
-            </div>
-            <Button
-              primary
-              onClick={() => {
-                if (product) addProducts(product._id)
-              }}
-            >
-              <Cart />
-              Add to cart
+            <Price>${product.price}</Price>
+            <Button black onClick={() => addProducts(product._id)}>
+              <Cart /> Add to cart
             </Button>
           </PriceRaw>
-        </div>
+          <p>{product.description}</p>
+        </WhiteBox>
       </ColWrapper>
     </Center>
   )
