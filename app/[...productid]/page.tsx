@@ -12,11 +12,13 @@ import ProductImages from '../components/ProductImages'
 import Button from '../components/Button'
 import Cart from '@/public/images/Cart'
 import { CartContext } from '../context/CartContextProvider'
+
 interface ProductPageProps {
   params: {
     productid: string[]
   }
 }
+
 const ColWrapper = styled.div`
   display: grid;
   grid-template-columns: 1fr;
@@ -26,18 +28,22 @@ const ColWrapper = styled.div`
     grid-template-columns: 0.8fr 1.2fr;
   }
 `
+
 const PriceRaw = styled.div`
   display: flex;
   gap: 20px;
   align-items: center;
 `
+
 const Price = styled.span`
   font-size: 1.4rem;
 `
+
 const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
   const { addProducts } = useContext(CartContext)
-  const [product, setProduct] = useState<Products | null>()
+  const [product, setProduct] = useState<Products | null>(null)
   const id = productid[1]
+
   const getProduct = async () => {
     try {
       const backendURL = config.backendURL
@@ -49,6 +55,7 @@ const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
       console.error('Error fetching data:', error.message)
     }
   }
+
   useEffect(() => {
     getProduct()
   }, [id])
@@ -57,7 +64,7 @@ const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
     <Center>
       <ColWrapper>
         <WhiteBox>
-          <ProductImages images={product?.imageUrl} />
+          <ProductImages images={product?.imageUrl || []} />
         </WhiteBox>
         <div>
           <Title>{product?.title}</Title>
@@ -66,11 +73,10 @@ const ProductPage: FC<ProductPageProps> = ({ params: { productid } }) => {
             <div>
               <Price>${product?.price}</Price>
             </div>
-
             <Button
               primary
               onClick={() => {
-                product && addProducts(product?._id)
+                if (product) addProducts(product._id)
               }}
             >
               <Cart />

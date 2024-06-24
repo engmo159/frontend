@@ -11,7 +11,9 @@ import dynamic from 'next/dynamic'
 import { colors } from '../theme/colors'
 import { spacing } from '../theme/spacing'
 import { CartContext } from '../context/CartContextProvider'
-import { ProductContext } from '../context/ProductContextProvider'
+import Link from 'next/link'
+
+// import { ProductContext } from '../context/ProductContextProvider'
 
 const Bg = styled.div`
   background-color: ${colors.background};
@@ -104,10 +106,12 @@ const Featured: FC = () => {
                   Read more
                 </Button>
                 <Button
-                  href={`/product/${featuredProduct?._id}`}
+                  // href={`/product/${featuredProduct?._id}`}
+
                   white
                   onClick={addFeaturedToCart}
                 >
+                  <Link href={`/product/${featuredProduct?._id}`}></Link>
                   <Cart />
                   Add to cart
                 </Button>

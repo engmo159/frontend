@@ -26,6 +26,7 @@ const ColumnsWrapper = styled.div`
 const StyledInfoCell = styled.td`
   padding: 10px 0;
 `
+
 const ProductImageBox = styled.div`
   width: 70px;
   height: 100px;
@@ -49,6 +50,7 @@ const ProductImageBox = styled.div`
     }
   }
 `
+
 const QuantityLabel = styled.span`
   padding: 0 15px;
   display: block;
@@ -57,10 +59,12 @@ const QuantityLabel = styled.span`
     padding: 0 10px;
   }
 `
+
 const CityHolder = styled.div`
   display: flex;
   gap: 5px;
 `
+
 const CartPage = () => {
   const { cartProducts, clearCart, addProducts, removeProduct } =
     useContext(CartContext)
@@ -73,13 +77,13 @@ const CartPage = () => {
   const [country, setCountry] = useState('')
 
   const backendURL = config.backendURL
+
   const getCartProducts = async () => {
     try {
       if (cartProducts.length > 0) {
         const { data } = await axios.post(`${backendURL}/products/cartIds`, {
           ids: cartProducts,
         })
-
         setProducts(data)
       } else {
         setProducts([])
@@ -88,18 +92,24 @@ const CartPage = () => {
       console.error('Error fetching data:', error.message)
     }
   }
+
   useEffect(() => {
     getCartProducts()
   }, [cartProducts])
+
   useEffect(() => {
-    if (window?.location.href.includes('success')) {
+    if (
+      typeof window !== 'undefined' &&
+      window.location.href.includes('success')
+    ) {
       clearCart()
     }
   }, [])
 
-  const AddMoreProducts = (id: string) => {
+  const addMoreProducts = (id: string) => {
     addProducts(id)
   }
+
   const removeCartProduct = (id: string) => {
     removeProduct(id)
   }
@@ -124,20 +134,23 @@ const CartPage = () => {
       window.location = response.data.url
     }
   }
-  if (window?.location.href.includes('success')) {
+
+  if (
+    typeof window !== 'undefined' &&
+    window.location.href.includes('success')
+  ) {
     return (
-      <>
-        <Center>
-          <ColumnsWrapper>
-            <WhiteBox>
-              <h1>Thanks for your order!</h1>
-              <p>We will email you as soon as your order will be sent.</p>
-            </WhiteBox>
-          </ColumnsWrapper>
-        </Center>
-      </>
+      <Center>
+        <ColumnsWrapper>
+          <WhiteBox>
+            <h1>Thanks for your order!</h1>
+            <p>We will email you as soon as your order has been sent.</p>
+          </WhiteBox>
+        </ColumnsWrapper>
+      </Center>
     )
   }
+
   return (
     <Center>
       <ColumnsWrapper>
@@ -169,24 +182,14 @@ const CartPage = () => {
                             height={100}
                           />
                         </ProductImageBox>
-
                         {product.title}
                       </StyledInfoCell>
                       <td>
-                        <Button
-                          onClick={() => {
-                            removeCartProduct(product._id)
-                          }}
-                        >
+                        <Button onClick={() => removeCartProduct(product._id)}>
                           -
                         </Button>
                         <QuantityLabel>{productCount}</QuantityLabel>
-
-                        <Button
-                          onClick={() => {
-                            AddMoreProducts(product._id)
-                          }}
-                        >
+                        <Button onClick={() => addMoreProducts(product._id)}>
                           +
                         </Button>
                       </td>
@@ -203,7 +206,6 @@ const CartPage = () => {
             </Table>
           )}
         </WhiteBox>
-        {/* !! means check boolean */}
         {!!cartProducts?.length && (
           <WhiteBox>
             <h2>Order information</h2>
@@ -251,7 +253,6 @@ const CartPage = () => {
               name='country'
               onChange={ev => setCountry(ev.target.value)}
             />
-
             <Button block black onClick={goToPayment}>
               Continue to payment
             </Button>
